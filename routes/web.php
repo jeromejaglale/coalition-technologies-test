@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Task;
+use Illuminate\Support\Facades\Log;
 
 Route::get('/', function () {
 	$task_list = Task::orderBy('priority')->get();
@@ -55,10 +56,35 @@ Route::post('/edit-task/{id}', function ($id, Request $request) {
 		abort(404);
 	}
 
+	$old_priority = $task->priority;
+
 	$task->name = $request->input('name');
 	$task->priority = $request->input('priority');
 	 
 	$task->save();
+
+	// if priority has been updated, update priority of other tasks
+	if($task->priority != $old_priority) {
+		if($task->priority > $old_priority) {
+			$task_list = Task::where('priority', '>=', 1)->where('priority', '<=', $task->priority)->where('id', '!=', $task->id)->orderBy('priority')->get();
+			$priority = 1;
+			foreach ($task_list as $t) {
+				$t->priority = $priority;
+				$t->save();
+				$priority++;
+			}
+		}
+		else {
+			$task_list = Task::where('priority', '>=', $task->priority)->where('id', '!=', $task->id)->orderBy('priority')->get();
+			$priority = $task->priority + 1;
+			foreach ($task_list as $t) {
+				$t->priority = $priority;
+				$t->save();
+				$priority++;
+			}
+		}
+	}
+
 	return redirect('/');
 });
 
