@@ -3,11 +3,13 @@
 @section('title', 'List')
 
 @section('content')
-<p>
-	<a href="/create-task">New task</a>
+<h1>Tasks</h1>
+
+<p class="text-end">
+	<a href="/create-task" class="btn btn-primary">Create new task</a>
 </p>
 
-<table>
+<table class="table">
 	<thead>
 		<td>Priority</td>
 		<td>Name</td>
