@@ -26,38 +26,6 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/TableDnD/0.9.1/jquery.tablednd.js" integrity="sha256-d3rtug+Hg1GZPB7Y/yTcRixO/wlI78+2m08tosoRn7A=" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.22.2/extensions/reorder-rows/bootstrap-table-reorder-rows.min.js" integrity="sha512-DCj7ndgkqddgKq0go3mFR63Z4G3vk7ct8zgpGSf7JqwyzD1VEwhZyzeeCJDH4pKXqZi/qkjI8eATqhsMg0U/1Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-		<script>
-		 	$(function() {
-		 		// send Laravel CSRF token when doing AJAX requests
-	 			$.ajaxSetup({
-					headers: {
-						'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-					}
-				});
-
-	 			// enable table rows to be re-ordered by drag and drop
-			  	$('table').bootstrapTable().on('reorder-row.bs.table', function (e, tableData, oldRow, newRow) {
-			  		const oldIndex = oldRow[0];
-			  		const newIndex = newRow[0];
-
-					if(oldIndex != newIndex) {
-						$.ajax({
-								url: '/update-priorities',
-								type: 'POST',
-								data: {
-								old_priority: oldIndex,
-								new_priority: newIndex
-							},
-							success: function (response) {
-								location.reload();
-							},
-							error: function (error) {
-								console.log('Error:', error);
-							}
-						});						
-					}
-			  	});
-    		});
-		</script>
+		@yield('extra_javascript')
 	</body>
 </html>

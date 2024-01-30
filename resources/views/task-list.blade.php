@@ -31,6 +31,40 @@
 		@endforeach
 	</tbody>
 </table>
+@stop
 
+@section('extra_javascript')
+	<script>
+	 	$(function() {
+	 		// send Laravel CSRF token when doing AJAX requests
+				$.ajaxSetup({
+				headers: {
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				}
+			});
 
+				// enable table rows to be re-ordered by drag and drop
+		  	$('table').bootstrapTable().on('reorder-row.bs.table', function (e, tableData, oldRow, newRow) {
+		  		const oldIndex = oldRow[0];
+		  		const newIndex = newRow[0];
+
+				if(oldIndex != newIndex) {
+					$.ajax({
+							url: '/update-priorities',
+							type: 'POST',
+							data: {
+							old_priority: oldIndex,
+							new_priority: newIndex
+						},
+						success: function (response) {
+							location.reload();
+						},
+						error: function (error) {
+							console.log('Error:', error);
+						}
+					});						
+				}
+		  	});
+		});
+	</script>
 @stop
