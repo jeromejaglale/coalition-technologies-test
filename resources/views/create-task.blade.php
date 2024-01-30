@@ -15,7 +15,7 @@
 		<label for="priority">Priority</label>
 		<select name="priority" id="priority" class="form-select">
 			@for ($i = 1; $i <= $max_priority; $i++)
-				<option value="{{ $max_priority }}">{{ $max_priority }}</option>
+				<option value="{{ $i }}">{{ $i }}</option>
 			@endfor
 		</select> 
 	</div>

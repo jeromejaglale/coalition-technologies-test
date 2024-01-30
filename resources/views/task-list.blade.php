@@ -9,17 +9,19 @@
 	<a href="/create-task" class="btn btn-primary">Create new task</a>
 </p>
 
-<table class="table">
+<table class="table" data-reorderable-rows="true" data-use-row-attr-func="true">
 	<thead>
-		<td>Priority</td>
-		<td>Name</td>
-		<td>Created</td>
-		<td>Modified</td>
-		<td></td>
+		<tr>
+			<th>Priority</th>
+			<th>Name</th>
+			<th>Created</th>
+			<th>Modified</th>
+			<th></th>
+		</tr>
 	</thead>
 	<tbody>
 		@foreach ($task_list as $task)
-			<tr>
+			<tr data-priority="{{ $loop->index }}">
 				<td>{{ $task->priority }}</td>
 				<td><a href="/edit-task/{{ $task->id }}">{{ $task->name }}</a></td>
 				<td>{{ $task->created_at->format('M d, Y') }}</td>
@@ -29,5 +31,6 @@
 		@endforeach
 	</tbody>
 </table>
+
 
 @stop
