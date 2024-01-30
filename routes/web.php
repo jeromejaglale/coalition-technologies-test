@@ -48,6 +48,32 @@ Route::get('/edit-task/{id}', function ($id) {
     return view('edit-task', $data);
 });
 
+// if priority of task with $task_id has been updated
+// from $old_priority to $new_priority,
+// update priority of other tasks accordingly
+function update_other_priorities($task_id, $old_priority, $new_priority) {
+	if($new_priority != $old_priority) {
+		if($new_priority > $old_priority) {
+			$task_list = Task::where('priority', '>=', 1)->where('priority', '<=', $new_priority)->where('id', '!=', $task_id)->orderBy('priority')->get();
+			$priority = 1;
+			foreach ($task_list as $t) {
+				$t->priority = $priority;
+				$t->save();
+				$priority++;
+			}
+		}
+		else {
+			$task_list = Task::where('priority', '>=', $new_priority)->where('id', '!=', $task_id)->orderBy('priority')->get();
+			$priority = $new_priority + 1;
+			foreach ($task_list as $t) {
+				$t->priority = $priority;
+				$t->save();
+				$priority++;
+			}
+		}
+	}
+}
+
 Route::post('/edit-task/{id}', function ($id, Request $request) {
 
 	$task = Task::find($id);
@@ -63,27 +89,7 @@ Route::post('/edit-task/{id}', function ($id, Request $request) {
 	 
 	$task->save();
 
-	// if priority has been updated, update priority of other tasks
-	if($task->priority != $old_priority) {
-		if($task->priority > $old_priority) {
-			$task_list = Task::where('priority', '>=', 1)->where('priority', '<=', $task->priority)->where('id', '!=', $task->id)->orderBy('priority')->get();
-			$priority = 1;
-			foreach ($task_list as $t) {
-				$t->priority = $priority;
-				$t->save();
-				$priority++;
-			}
-		}
-		else {
-			$task_list = Task::where('priority', '>=', $task->priority)->where('id', '!=', $task->id)->orderBy('priority')->get();
-			$priority = $task->priority + 1;
-			foreach ($task_list as $t) {
-				$t->priority = $priority;
-				$t->save();
-				$priority++;
-			}
-		}
-	}
+	update_other_priorities($task->id, $old_priority, $task->priority);
 
 	return redirect('/');
 });
@@ -91,9 +97,6 @@ Route::post('/edit-task/{id}', function ($id, Request $request) {
 Route::post('/update-priorities', function (Request $request) {
 	$old_priority = $request->input('old_priority');
 	$new_priority = $request->input('new_priority');
-
-	Log::debug($old_priority);
-	Log::debug($new_priority);
 
 	$task = Task::where('priority', $old_priority)->first();
 
@@ -104,27 +107,7 @@ Route::post('/update-priorities', function (Request $request) {
 	$task->priority = $new_priority;
 	$task->save();
 
-	// if priority has been updated, update priority of other tasks
-	if($task->priority != $old_priority) {
-		if($task->priority > $old_priority) {
-			$task_list = Task::where('priority', '>=', 1)->where('priority', '<=', $task->priority)->where('id', '!=', $task->id)->orderBy('priority')->get();
-			$priority = 1;
-			foreach ($task_list as $t) {
-				$t->priority = $priority;
-				$t->save();
-				$priority++;
-			}
-		}
-		else {
-			$task_list = Task::where('priority', '>=', $task->priority)->where('id', '!=', $task->id)->orderBy('priority')->get();
-			$priority = $task->priority + 1;
-			foreach ($task_list as $t) {
-				$t->priority = $priority;
-				$t->save();
-				$priority++;
-			}
-		}
-	}
+	update_other_priorities($task->id, $old_priority, $task->priority);
 });
 
 Route::get('/delete-task/{id}', function ($id) {
