@@ -5,8 +5,12 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Task;
 
 Route::get('/', function () {
-	echo 'hi';
-	return;
+	$task_list = Task::orderBy('priority')->get();
+
+	$data = [];
+	$data['task_list'] = $task_list;
+
+    return view('task-list', $data);
 });
 
 Route::get('/create-task', function () {
