@@ -30,7 +30,7 @@ Route::post('/create-task', function (Request $request) {
 	// create task with highest priority by default
 	$task = Task::create(['name' => $request->input('name'), 'priority' => Task::count()]);
 
-	// only then update task priority
+	// only then update task priority, so the other tasks are reordered if needed
 	$task->update_priority($request->input('priority'));
 
 	return redirect('/');
@@ -55,14 +55,11 @@ Route::get('/edit-task/{id}', function ($id) {
 
 
 Route::post('/edit-task/{id}', function ($id, Request $request) {
-
 	$task = Task::find($id);
 
 	if($task == null) {
 		abort(404);
 	}
-
-	$old_priority = $task->priority;
 
 	$task->name = $request->input('name');
 	$task->save();
@@ -76,6 +73,7 @@ Route::post('/update-priorities', function (Request $request) {
 	$old_priority = $request->input('old_priority');
 	$new_priority = $request->input('new_priority');
 
+	// find task whose priority was changed in the UI
 	$task = Task::where('priority', $old_priority)->first();
 
 	if($task == null) {
@@ -92,7 +90,7 @@ Route::get('/delete-task/{id}', function ($id) {
 		abort(404);
 	}
 
-	// update task priority to highest so its deletion won't affect other priorities
+	// update task priority to highest first, so its deletion won't affect other priorities
 	$task->update_priority(Task::count());
 
 	$task->delete();
