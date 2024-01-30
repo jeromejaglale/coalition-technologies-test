@@ -30,3 +30,46 @@ Route::post('/create-task', function (Request $request) {
 	return redirect('/');
 });
 
+Route::get('/edit-task/{id}', function ($id) {
+	$task = Task::where('id', $id)->first();
+
+	if($task == null) {
+		abort(404);
+	}
+
+	$nb_tasks = Task::count();
+	$max_priority = $nb_tasks;
+
+	$data = [];
+	$data['task'] = $task;
+	$data['max_priority'] = $max_priority;
+
+    return view('edit-task', $data);
+});
+
+Route::post('/edit-task/{id}', function ($id, Request $request) {
+
+	$task = Task::find($id);
+
+	if($task == null) {
+		abort(404);
+	}
+
+	$task->name = $request->input('name');
+	$task->priority = $request->input('priority');
+	 
+	$task->save();
+	return redirect('/');
+});
+
+Route::get('/delete-task/{id}', function ($id) {
+	$task = Task::where('id', $id)->first();
+
+	if($task == null) {
+		abort(404);
+	}
+
+	$task->delete();
+
+	return redirect('/');
+});
