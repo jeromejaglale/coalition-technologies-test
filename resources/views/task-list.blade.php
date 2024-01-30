@@ -57,6 +57,7 @@
 							new_priority: newIndex
 						},
 						success: function (response) {
+							// just reload the page for now
 							location.reload();
 						},
 						error: function (error) {
