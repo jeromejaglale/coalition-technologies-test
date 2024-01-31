@@ -28,7 +28,8 @@ Route::post('/create-task', function (Request $request) {
 	$task_data = $request->all();
 
 	// create task with highest priority by default
-	$task = Task::create(['name' => $request->input('name'), 'priority' => Task::count()]);
+	$highest_priority = Task::count() + 1;
+	$task = Task::create(['name' => $request->input('name'), 'priority' => $highest_priority]);
 
 	// only then update task priority, so the other tasks are reordered if needed
 	$task->update_priority($request->input('priority'));
